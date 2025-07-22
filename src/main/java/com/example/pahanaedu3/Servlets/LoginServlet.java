@@ -41,7 +41,7 @@ public class LoginServlet extends HttpServlet {
             }
 
             // Forward to login page
-            request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
         }
 
         @Override
@@ -55,7 +55,7 @@ public class LoginServlet extends HttpServlet {
             if (username == null || username.trim().isEmpty() ||
                     password == null || password.trim().isEmpty()) {
                 request.setAttribute("error", "Username and password are required");
-                request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
                 return;
             }
 
@@ -80,7 +80,7 @@ public class LoginServlet extends HttpServlet {
                     // Login failed
                     request.setAttribute("error", "Invalid username or password");
                     request.setAttribute("username", username);
-                    request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
                 }
             }
         }
