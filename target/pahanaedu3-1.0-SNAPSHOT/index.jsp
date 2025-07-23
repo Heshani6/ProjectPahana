@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba1 100%);
+      background: linear-gradient(to right, #7f7fd5, #86a8e7, #91eae4);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -71,6 +71,13 @@
     .login-btn:hover {
       transform: translateY(-2px);
     }
+
+    .register-link {
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+    }
+
     .error-message {
       background: #fee;
       color: #c33;
@@ -120,6 +127,10 @@
              required autocomplete="current-password">
     </div>
     <button type="submit" class="login-btn">Sign In</button>
+
+    <div class="register-link">
+      Don't have an account? <a href="register.jsp">Register</a>
+    </div>
   </form>
   <div class="footer">
     &copy; 2024 Billing Management System. All rights reserved.
