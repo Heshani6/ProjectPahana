@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
     private static DatabaseConnection instance;
-    private static final String URL = "jdbc:postgresql://localhost:5432/pahana_edu";
+    private static final String URL = "jdbc:postgresql://localhost:5432/pahana_edu3";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "123456";
 
@@ -27,5 +27,18 @@ public class DatabaseConnection {
 
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+    }
+
+    public static void main(String[] args) {
+        try {
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            if (conn != null && !conn.isClosed()) {
+                System.out.println("Database connection successful!");
+            } else {
+                System.out.println("Database connection failed!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
