@@ -23,7 +23,7 @@ public class UserDAO {
     // Abstraction: getAllUsers returns a list of all staff User objects
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT id, username, password, role FROM users WHERE role = 'Staff'";
+        String sql = "SELECT id, username, password, role FROM users WHERE role = 'staff'";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
