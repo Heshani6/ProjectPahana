@@ -69,14 +69,7 @@ public class RegisterServlet extends HttpServlet {
             } else {
                 request.setAttribute("error", "Registration failed. Username may already exist.");
             }
-        }
-
-        if ("admin".equals(from)) {
-            java.util.List<com.example.pahanaedu3.Models.User> staffUsers = userService.getAllStaffUsers();
-            request.setAttribute("users", staffUsers); // Use 'users' so the JSP works
-            request.getRequestDispatcher("/user-management.jsp").forward(request, response);
-        } else {
-            request.getRequestDispatcher("/register.jsp").forward(request, response);
+            request.getRequestDispatcher("add-staff.jsp").forward(request, response);
         }
     }
 } 
