@@ -48,6 +48,10 @@ public class UserService {
     public List<User> getAllStaffUsers() {
         return userDAO.getAllStaffUsers();
     }
+
+    public User getUserById(int id) {
+        return userDAO.getUserById(id);
+    }
 }
 
 
