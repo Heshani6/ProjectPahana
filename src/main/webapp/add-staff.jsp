@@ -7,7 +7,7 @@
   <title>Add Staff - Pahana EduBill</title>
   <style>
     body {
-      background: linear-gradient(120deg, #b8c6db 0%, #f5f7fa 100%);
+      background: #f7f7f7;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
@@ -27,10 +27,10 @@
     }
     .form-title {
       font-size: 1.5rem;
-      color: #6c63ff;
       font-weight: 700;
       margin-bottom: 1.5rem;
       text-align: center;
+      color: #2c3e50;
     }
     .form-group {
       margin-bottom: 1.2rem;
@@ -56,7 +56,7 @@
       outline: none;
     }
     .btn-submit {
-      background: #6c63ff;
+      background: #8e8ad8;
       color: #fff;
       border: none;
       padding: 0.9rem 0;
