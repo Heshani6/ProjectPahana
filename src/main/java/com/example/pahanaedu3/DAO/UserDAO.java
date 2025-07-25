@@ -152,5 +152,27 @@ public class UserDAO {
         }
         return null;
     }
+
+    public List<User> searchUsersByUsername(String username) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT id, username, password, role FROM users WHERE LOWER(username) LIKE ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, "%" + username.toLowerCase() + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                    );
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
 }
 

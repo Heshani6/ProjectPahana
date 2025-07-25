@@ -23,20 +23,20 @@ public class UserServlet extends HttpServlet {
 
     // Handles GET requests: list all users or show a single user for editing
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if ("edit".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            User user = userService.getUserById(id);
-            request.setAttribute("user", user);
-            request.getRequestDispatcher("edit-user.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String search = request.getParameter("search");
+        List<User> users;
+        if (search != null && !search.trim().isEmpty()) {
+            users = userService.searchUsersByUsername(search.trim());
         } else {
-            // Default: list all users
-            List<User> users = userService.getAllUsers();
-            request.setAttribute("users", users);
-            request.getRequestDispatcher("user-management.jsp").forward(request, response);
+            users = userService.getAllUsers();
         }
+        request.setAttribute("users", users);
+        String msg = request.getParameter("msg");
+        if (msg != null) {
+            request.setAttribute("msg", msg);
+        }
+        request.getRequestDispatcher("user-management.jsp").forward(request, response);
     }
 
     @Override
@@ -72,3 +72,4 @@ public class UserServlet extends HttpServlet {
 
 
 }
+ 
