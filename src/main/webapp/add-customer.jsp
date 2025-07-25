@@ -110,9 +110,16 @@
   </style>
 </head>
 <body>
-  <a href="admin-dashboard.jsp" class="back-arrow" title="Back to Admin Dashboard">
-    &#8592;
-  </a>
+<%
+  String backUrl = "admin-dashboard.jsp";
+  String role = (String) session.getAttribute("role");
+  if ("staff".equalsIgnoreCase(role)) {
+    backUrl = "staff-dashboard.jsp";
+  }
+%>
+<a href="<%= backUrl %>" class="back-arrow" title="Back to Dashboard">
+  &#8592;
+</a>
   <form class="form-card" action="add-customer" method="post" autocomplete="off">
     <div class="form-title">Add Customer</div>
     <div class="feedback">
