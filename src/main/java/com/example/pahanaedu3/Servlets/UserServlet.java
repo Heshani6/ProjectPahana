@@ -23,21 +23,21 @@ public class UserServlet extends HttpServlet {
 
     // Handles GET requests: list all users or show a single user for editing
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String search = request.getParameter("search");
-        List<User> users;
-        if (search != null && !search.trim().isEmpty()) {
-            users = userService.searchUsersByUsername(search.trim());
-        } else {
-            users = userService.getAllUsers();
-        }
-        request.setAttribute("users", users);
-        String msg = request.getParameter("msg");
-        if (msg != null) {
-            request.setAttribute("msg", msg);
-        }
-        request.getRequestDispatcher("user-management.jsp").forward(request, response);
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String search = request.getParameter("search");
+    List<User> users;
+    if (search != null && !search.trim().isEmpty()) {
+        users = userService.searchUsersByUsername(search.trim());
+    } else {
+        users = userService.getAllUsers();
     }
+    request.setAttribute("users", users);
+    String msg = request.getParameter("msg");
+    if (msg != null) {
+        request.setAttribute("msg", msg);
+    }
+    request.getRequestDispatcher("user-management.jsp").forward(request, response);
+}
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

@@ -98,16 +98,25 @@
       z-index: 10;
     }
     .back-arrow:hover {
-      background: #2563eb;
+      background: #babae3;
       color: #fff;
     }
 
   </style>
 </head>
 <body>
-<a href="admin-dashboard.jsp" class="back-arrow" title="Back to Admin Dashboard">
+
+<%
+  String backUrl = "user";
+  String role = (String) session.getAttribute("role");
+  if ("admin".equalsIgnoreCase(role)) {
+    backUrl = "user";
+  }
+%>
+<a href="<%= backUrl %>" class="back-arrow" title="Back to Customer Management">
   &#8592;
 </a>
+
   <form class="form-card" action="register" method="post" autocomplete="off">
     <div class="form-title">Add Staff</div>
     <div class="feedback">
