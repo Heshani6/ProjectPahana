@@ -28,12 +28,18 @@ public class RegisterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String from = request.getParameter("from");
+        String msg = request.getParameter("msg");
+        
         if ("admin".equals(from)) {
             // Fetch all users from the database
             java.util.List<com.example.pahanaedu3.Models.User> staffUsers = userService.getAllStaffUsers();
             System.out.println("Loaded users: " + staffUsers);
             // Set the list as a request attribute
             request.setAttribute("users", staffUsers);
+            // Set success message if provided
+            if (msg != null) {
+                request.setAttribute("msg", msg);
+            }
             // Forward to the JSP
             request.getRequestDispatcher("/user-management.jsp").forward(request, response);
         } else {
@@ -65,12 +71,26 @@ public class RegisterServlet extends HttpServlet {
             // Delegates business logic to the service layer
             boolean success = userService.createUser(username, password, role);
             if (success) {
-                request.setAttribute("success", "Staff account created successfully!");
+                if ("admin".equals(from)) {
+                    // If adding from admin dashboard, show success message on register page first
+                    request.setAttribute("success", "Staff account created successfully!");
+                    request.setAttribute("clearForm", "true"); // Flag to clear form
+                    request.setAttribute("autoRedirect", "true"); // Flag to auto-redirect
+                    request.getRequestDispatcher("/register.jsp").forward(request, response);
+                    return;
+                } else {
+                    // If adding from registration page, show success message and clear form
+                    request.setAttribute("success", "Staff account created successfully!");
+                    request.setAttribute("clearForm", "true"); // Flag to clear form
+                    request.getRequestDispatcher("/register.jsp").forward(request, response);
+                    return;
+                }
             } else {
                 request.setAttribute("error", "Registration failed. Username may already exist.");
             }
         }
 
+        // Handle error cases or when no action was taken
         if ("admin".equals(from)) {
             java.util.List<com.example.pahanaedu3.Models.User> staffUsers = userService.getAllStaffUsers();
             request.setAttribute("users", staffUsers); // Use 'users' so the JSP works

@@ -138,7 +138,7 @@ public class UserDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
+            if (rs.next()) {
                     User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
