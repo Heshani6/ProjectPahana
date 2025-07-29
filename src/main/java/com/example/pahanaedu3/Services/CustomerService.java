@@ -31,10 +31,16 @@ public class CustomerService {
         return customerDAO.getAllCustomers();
     }
 
-    // Update a customer
     public boolean updateCustomer(Customer customer) {
+        Customer existing = customerDAO.getCustomerById(customer.getId());
+        if (existing == null) return false;
+
+        // If any field is null in the input, keep the old value
+        if (customer.getPhone() == null) customer.setPhone(existing.getPhone());
+
         return customerDAO.updateCustomer(customer);
     }
+
 
     // Delete a customer
     public boolean deleteCustomer(int id) {

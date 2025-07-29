@@ -22,21 +22,32 @@ public class CustomerDAO {
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT id, account_number, name, address, phone FROM customers";
+        System.out.println("CustomerDAO: Executing SQL: " + sql);
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
+            System.out.println("CustomerDAO: SQL executed successfully");
             while (rs.next()) {
-                Customer customer = new Customer(
-                        rs.getInt("id"),
-                        rs.getString("account_number"),
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone")
-                );
+                int id = rs.getInt("id");
+                String accountNumber = rs.getString("account_number");
+                String name = rs.getString("name");
+                String address = rs.getString("address");
+                String phone = rs.getString("phone");
+                
+                System.out.println("CustomerDAO: Raw data - ID: " + id + 
+                    ", Account: " + accountNumber + 
+                    ", Name: " + name + 
+                    ", Address: " + address + 
+                    ", Phone: " + phone);
+                
+                Customer customer = new Customer(id, accountNumber, name, address, phone);
                 customers.add(customer);
+                System.out.println("CustomerDAO: Added customer - ID: " + customer.getId() + ", Name: " + customer.getName());
             }
+            System.out.println("CustomerDAO: Total customers fetched: " + customers.size());
         } catch (SQLException e) {
             System.err.println("Error fetching customers: " + e.getMessage());
+            e.printStackTrace();
         }
         return customers;
     }
