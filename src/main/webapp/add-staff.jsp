@@ -77,6 +77,7 @@
     }
     .success {
       color: #38a169;
+      transition: opacity 0.5s ease-in;
     }
     .back-arrow {
       position: absolute;
@@ -107,13 +108,13 @@
 <body>
 
 <%
-  String backUrl = "user";
+  String backUrl = "register?from=admin";
   String role = (String) session.getAttribute("role");
   if ("admin".equalsIgnoreCase(role)) {
-    backUrl = "user";
+    backUrl = "register?from=admin";
   }
 %>
-<a href="<%= backUrl %>" class="back-arrow" title="Back to Customer Management">
+<a href="<%= backUrl %>" class="back-arrow" title="Back to User Management">
   &#8592;
 </a>
 
@@ -142,5 +143,45 @@
     <input type="hidden" name="from" value="admin">
     <button type="submit" class="btn-submit">Create Staff</button>
   </form>
+
+<script>
+// Clear form fields if clearForm flag is set
+<% if (request.getAttribute("clearForm") != null) { %>
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('confirmPassword').value = '';
+<% } %>
+
+// Auto-redirect after success message (for admin dashboard)
+<% if (request.getAttribute("autoRedirect") != null) { %>
+  // Show success message for 3 seconds, then redirect to user management
+  setTimeout(function() {
+    window.location.href = 'add-staff.jsp';
+  }, 3000); // Redirect after 3 seconds
+<% } %>
+
+// Add fade effect to success message
+<% if (request.getAttribute("success") != null) { %>
+  // Add fade-in effect to success message
+  document.addEventListener('DOMContentLoaded', function() {
+    var successSpan = document.querySelector('.success');
+    if (successSpan) {
+      successSpan.style.opacity = '0';
+      successSpan.style.transition = 'opacity 0.7s ease-in';
+      setTimeout(function() {
+        successSpan.style.opacity = '1';
+      }, 100);
+    }
+  });
+
+// Auto-redirect after showing success message
+<% if (request.getAttribute("autoRedirect") != null && request.getAttribute("redirectTo") != null) { %>
+setTimeout(function () {
+  window.location.href = 'user-management.jsp';
+}, 3000); // Wait 3 seconds before redirect
+<% } %>
+
+<% } %>
+</script>
 </body>
 </html>

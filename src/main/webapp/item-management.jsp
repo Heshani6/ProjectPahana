@@ -35,51 +35,122 @@
       margin-bottom: 24px;
     }
 
+    /* ========== Back Arrow ========== */
+    .back-arrow {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      font-size: 2rem;
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: bold;
+      background: #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(38,99,235,0.08);
+      transition: background 0.2s, color 0.2s;
+      z-index: 10;
+    }
+
+    .back-arrow:hover {
+      background: #babae3;
+      color: #fff;
+    }
+
     /* ========== Top Bar ========== */
     .top-bar {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 18px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .search-section {
+      display: flex;
+      gap: 12px;
+      flex: 1;
+      max-width: 600px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #27ae60;
     }
 
     /* ========== Button Styles ========== */
     .btn {
       border: none;
-      padding: 6px 16px;
-      border-radius: 4px;
+      padding: 12px 24px;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: 500;
-      transition: background 0.2s;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
     .btn-add {
-      background: #27ae60;
+      background: #059669;
       color: #fff;
       margin-left: 8px;
     }
 
+    .btn-success {
+      background: #059669;
+      color: #fff;
+      margin-left: 8px;
+    }
+
+
     .btn-edit {
-      background: #2f69e4;
+      background: #2563eb;
       color: #fff;
     }
+
 
     .btn-delete {
-      background: #c0392b;
+      background: #dc2626;
       color: #fff;
     }
 
+
+
     .btn-view {
-      background: rgb(57, 60, 64);
+      background: #4b5563;
       color: #fff;
     }
 
     .btn-search {
-      background: rgb(141, 141, 214);
+      background: #8b5cf6;
       color: #fff;
     }
 
-    .btn:hover {
-      opacity: 0.9;
+    .btn-search:hover {
+      background: #7c3aed;
     }
 
     /* ========== Table Styles ========== */
@@ -106,8 +177,10 @@
     /* ========== Action Buttons Container ========== */
     .actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
+
+
 
     /* ========== Modal Styles ========== */
     .modal {
@@ -176,30 +249,6 @@
     .toast.error {
       background: #c0392b;
     }
-    .back-arrow {
-      position: absolute;
-      top: 30px;
-      left: 30px;
-      font-size: 2rem;
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: bold;
-      background: #fff;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(38,99,235,0.08);
-      transition: background 0.2s, color 0.2s;
-      z-index: 10;
-    }
-
-    .back-arrow:hover {
-      background: #babae3;
-      color: #fff;
-    }
 
   </style>
 </head>
@@ -209,15 +258,21 @@
 </a>
 <div class="container">
   <h2>Item Management</h2>
+
+  <!-- Top Bar -->
   <div class="top-bar">
-    <a href="add-item" class="btn btn-add">Add Item</a>
-  </div>
-  <div class="search-bar" style="margin-bottom: 18px; display: flex; gap: 10px;">
-    <form action="item" method="get" style="display: flex; gap: 10px; width: 100%;">
-      <input type="text" name="search" placeholder="Search by item name..." value="<%= request.getParameter("search") != null ? request.getParameter("search") : "" %>" style="flex:1; padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em;">
-      <button type="submit" class="btn btn-search">Search</button>
-      <a href="item" class="btn btn-delete" style="text-decoration:none;">Clear</a>
-    </form>
+    <div class="search-section">
+      <input type="text" class="search-input" placeholder="Search items by name..." id="searchInput" onkeypress="handleSearchKeyPress(event)">
+      <button type="button" class="btn btn-search" onclick="searchItems()">
+        <i class="fas fa-search"></i> Search
+      </button>
+      <button type="button" class="btn btn-delete" onclick="clearSearch()">
+        <i class="fas fa-times"></i> Clear
+      </button>
+    </div>
+    <a href="add-item.jsp" class="btn btn-success">
+      <i class="fas fa-plus"></i> Add Item
+    </a>
   </div>
   <table>
     <thead>
@@ -240,12 +295,18 @@
       <td><%= item.getPrice() %></td>
       <td><%= item.getQuantity() %></td>
       <td class="actions">
-        <button class="btn btn-view" data-id="<%= item.getId() %>" data-name="<%= item.getName().replace("\"", "&quot;") %>" data-category="<%= item.getCategoryName().replace("\"", "&quot;") %>" data-price="<%= item.getPrice() %>" data-quantity="<%= item.getQuantity() %>" onclick="openViewModal(this)">View</button>
-        <button class="btn btn-edit" data-id="<%= item.getId() %>" data-name="<%= item.getName().replace("\"", "&quot;") %>" data-category="<%= item.getCategoryName().replace("\"", "&quot;") %>" data-price="<%= item.getPrice() %>" data-quantity="<%= item.getQuantity() %>" onclick="openEditModal(this)">Edit</button>
+        <button class="btn btn-view" onclick="openViewModal('<%= item.getId() %>', '<%= item.getName().replace("'", "\\'") %>', '<%= item.getCategoryName().replace("'", "\\'") %>', '<%= item.getPrice() %>', '<%= item.getQuantity() %>')">
+          <i class="fas fa-eye"></i> View
+        </button>
+        <button class="btn btn-edit" onclick="openEditModal('<%= item.getId() %>', '<%= item.getName().replace("'", "\\'") %>', '<%= item.getCategoryName().replace("'", "\\'") %>', '<%= item.getPrice() %>', '<%= item.getQuantity() %>')">
+          <i class="fas fa-pencil"></i> Edit
+        </button>
         <form action="item" method="post" style="display:inline;" onsubmit="return confirm('Delete this item?');">
           <input type="hidden" name="action" value="delete" />
           <input type="hidden" name="id" value="<%= item.getId() %>" />
-          <button type="submit" class="btn btn-delete">Delete</button>
+          <button type="submit" class="btn btn-delete">
+            <i class="fas fa-trash"></i> Delete
+          </button>
         </form>
       </td>
     </tr>
@@ -305,24 +366,24 @@
 
 <script>
   // Edit Modal logic
-  function openEditModal(btn) {
-    document.getElementById('editItemId').value = btn.getAttribute('data-id');
-    document.getElementById('editName').value = btn.getAttribute('data-name');
-    document.getElementById('editCategory').value = btn.getAttribute('data-category');
-    document.getElementById('editPrice').value = btn.getAttribute('data-price');
-    document.getElementById('editQuantity').value = btn.getAttribute('data-quantity');
+  function openEditModal(id, name, category, price, quantity) {
+    document.getElementById('editItemId').value = id;
+    document.getElementById('editName').value = name;
+    document.getElementById('editCategory').value = category;
+    document.getElementById('editPrice').value = price;
+    document.getElementById('editQuantity').value = quantity;
     document.getElementById('editModal').style.display = 'block';
   }
   function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
   }
   // View Modal logic
-  function openViewModal(btn) {
-    document.getElementById('viewItemId').textContent = btn.getAttribute('data-id');
-    document.getElementById('viewItemName').textContent = btn.getAttribute('data-name');
-    document.getElementById('viewItemCategory').textContent = btn.getAttribute('data-category');
-    document.getElementById('viewItemPrice').textContent = btn.getAttribute('data-price');
-    document.getElementById('viewItemQuantity').textContent = btn.getAttribute('data-quantity');
+  function openViewModal(id, name, category, price, quantity) {
+    document.getElementById('viewItemId').textContent = id;
+    document.getElementById('viewItemName').textContent = name;
+    document.getElementById('viewItemCategory').textContent = category;
+    document.getElementById('viewItemPrice').textContent = price;
+    document.getElementById('viewItemQuantity').textContent = quantity;
     document.getElementById('viewModal').style.display = 'block';
   }
   function closeViewModal() {
@@ -348,6 +409,25 @@
   <% if (msg != null) { %>
   showToast('<%= msg.replace("'", "\\'") %>', <%= msg.toLowerCase().contains("success") ? "'success'" : "'error'" %>);
   <% } %>
+
+  function searchItems() {
+    const searchTerm = document.getElementById('searchInput').value;
+    // Implement search functionality
+    console.log('Searching for:', searchTerm);
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    // Implement clear functionality
+  }
+
+  function handleSearchKeyPress(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      searchItems();
+    }
+  }
+
   // Edit form validation
   function validateEditForm() {
     var name = document.getElementById('editName').value.trim();

@@ -106,20 +106,23 @@
       z-index: 10;
     }
     .back-arrow:hover {
-      background: #2563eb;
+      background: #babae3;
       color: #fff;
     }
   </style>
 </head>
 <body>
 <%
-  String backUrl = "admin-dashboard.jsp";
+  String backUrl = "customer";
   String role = (String) session.getAttribute("role");
-  if ("staff".equalsIgnoreCase(role)) {
-    backUrl = "staff-dashboard.jsp";
+  if ("admin".equals(role)) {
+    backUrl = "admin-dashboard.jsp";
+  } else if ("staff".equals(role)) {
+    backUrl= "staff-dashboard.jsp";
+
   }
 %>
-<a href="<%= backUrl %>" class="back-arrow" title="Back to Dashboard">
+<a href="<%= backUrl %>" class="back-arrow" title="Back to Customer Management">
   &#8592;
 </a>
   <form class="form-card" action="add-customer" method="post" autocomplete="off">

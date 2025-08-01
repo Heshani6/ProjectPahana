@@ -134,26 +134,17 @@
       font-size: 12px;
       color: gray;
     }
-    .error-message {
-      background: #fee;
-      color: #c33;
-      padding: 0.75rem;
-      border-radius: 5px;
-      margin-bottom: 1rem;
-      border: 1px solid #fcc;
-    }
-    .success-message {
-      background: #e8f4fd;
-      color: #006600;
-      padding: 0.75rem;
-      border-radius: 5px;
-      margin-bottom: 1rem;
-      border: 1px solid #b3d9ff;
-      font-size: 0.9rem;
-    }
     .form-label {
       text-align: left;
       display: block;
+    }
+    .feedback {
+      color: #e53e3e;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .success {
+      color: #38a169;
     }
   </style>
 </head>
@@ -163,16 +154,13 @@
     <h1>Register to EduBill</h1>
     <p>Create your account</p>
   </div>
-  <% if (request.getAttribute("error") != null) { %>
-    <div class="error-message">
-      <%= request.getAttribute("error") %>
-    </div>
-  <% } %>
-  <% if (request.getAttribute("success") != null) { %>
-    <div class="success-message">
-      <%= request.getAttribute("success") %>
-    </div>
-  <% } %>
+  <div class="feedback">
+    <% if (request.getAttribute("error") != null) { %>
+      <span><%= request.getAttribute("error") %></span>
+    <% } else if (request.getAttribute("success") != null) { %>
+      <span class="success"><%= request.getAttribute("success") %></span>
+    <% } %>
+  </div>
 
   <form action="register" method="post">
     <div class="form-group">
