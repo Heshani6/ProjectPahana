@@ -157,4 +157,28 @@ public class CustomerDAO {
         }
         return false;
     }
+
+    public List<Customer> searchCustomersByAccountNumber(String accountNumber) {
+        List<Customer> customers = new ArrayList<>();
+        String sql = "SELECT id, account_number, name, address, phone FROM customers WHERE account_number LIKE ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + accountNumber + "%");
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Customer customer = new Customer(
+                            rs.getInt("id"),
+                            rs.getString("account_number"),
+                            rs.getString("name"),
+                            rs.getString("address"),
+                            rs.getString("phone")
+                    );
+                    customers.add(customer);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error searching customers: " + e.getMessage());
+        }
+        return customers;
+    }
 }

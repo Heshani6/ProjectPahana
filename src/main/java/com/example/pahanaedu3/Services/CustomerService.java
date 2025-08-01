@@ -62,4 +62,12 @@ public class CustomerService {
         }
         return customerDAO.accountNumberExists(accountNumber);
     }
+
+    // Search customers by account number
+    public List<Customer> searchCustomersByAccountNumber(String accountNumber) {
+        if (accountNumber == null || accountNumber.trim().isEmpty()) {
+            return getAllCustomers();
+        }
+        return customerDAO.searchCustomersByAccountNumber(accountNumber.trim());
+    }
 }
