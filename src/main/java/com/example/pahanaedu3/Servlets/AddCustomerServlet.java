@@ -36,11 +36,12 @@ public class AddCustomerServlet extends HttpServlet {
 
         boolean success = customerService.addCustomer(customer);
         if (success) {
-            request.setAttribute("success", "Customer added successfully!");
+            // Redirect to customer management with success message
+            response.sendRedirect("customer?msg=" + java.net.URLEncoder.encode("Customer added successfully!", "UTF-8"));
         } else {
             request.setAttribute("error", "Failed to add customer. Please check the details and try again.");
+            // Forward back to the add-customer.jsp (fields will be empty)
+            request.getRequestDispatcher("add-customer.jsp").forward(request, response);
         }
-        // Forward back to the add-customer.jsp (fields will be empty)
-        request.getRequestDispatcher("add-customer.jsp").forward(request, response);
     }
 }

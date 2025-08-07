@@ -70,4 +70,7 @@ public class CustomerService {
         }
         return customerDAO.searchCustomersByAccountNumber(accountNumber.trim());
     }
+    public int getCustomerCount() {
+        return customerDAO.getCustomerCount();
+    }
 }

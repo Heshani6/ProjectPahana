@@ -181,4 +181,18 @@ public class CustomerDAO {
         }
         return customers;
     }
+
+    public int getCustomerCount() {
+        String sql = "SELECT COUNT(*) FROM customers";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting customer count: " + e.getMessage());
+        }
+        return 0;
+    }
 }
