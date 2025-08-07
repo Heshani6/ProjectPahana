@@ -56,6 +56,22 @@ public class UserService {
     public List<User> searchUsersByUsername(String username) {
         return userDAO.searchUsersByUsername(username);
     }
+
+    public boolean usernameExists(String username) {
+        return userDAO.usernameExists(username);
+    }
+
+    public User getUserByUsername(String username) {
+        return userDAO.getUserByUsername(username);
+    }
+
+    public boolean updateUserPassword(int userId, String newPassword) {
+        return userDAO.updateUserPassword(userId, newPassword);
+    }
+
+    public int getStaffCount() {
+        return userDAO.getStaffCount();
+    }
 }
 
 

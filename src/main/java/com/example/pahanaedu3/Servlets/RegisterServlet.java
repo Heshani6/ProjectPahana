@@ -76,13 +76,13 @@ public class RegisterServlet extends HttpServlet {
                     request.setAttribute("success", "Staff account created successfully!");
                     request.setAttribute("clearForm", "true"); // Flag to clear form
                     request.setAttribute("autoRedirect", "true"); // Flag to auto-redirect
-                    request.getRequestDispatcher("/register.jsp").forward(request, response);
+                    request.getRequestDispatcher("add-staff.jsp").forward(request, response);
                     return;
                 } else {
                     // If adding from registration page, show success message and clear form
                     request.setAttribute("success", "Staff account created successfully!");
                     request.setAttribute("clearForm", "true"); // Flag to clear form
-                    request.getRequestDispatcher("/register.jsp").forward(request, response);
+                    request.getRequestDispatcher("add-staff.jsp").forward(request, response);
                     return;
                 }
             } else {

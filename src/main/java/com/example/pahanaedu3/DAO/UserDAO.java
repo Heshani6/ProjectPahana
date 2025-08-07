@@ -138,7 +138,7 @@ public class UserDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
-            if (rs.next()) {
+                if (rs.next()) {
                     User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
@@ -161,10 +161,10 @@ public class UserDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     User user = new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("role")
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("role")
                     );
                     users.add(user);
                 }
@@ -174,5 +174,73 @@ public class UserDAO {
         }
         return users;
     }
-}
 
+    // Check if username exists
+    public boolean usernameExists(String username) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking username: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Get user by username only (for password checking)
+    public User getUserByUsername(String username) {
+        String sql = "SELECT id, username, password, role FROM users WHERE username = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setRole(rs.getString("role"));
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching user by username: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean updateUserPassword(int userId, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newPassword);
+            pstmt.setInt(2, userId);
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating password: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public int getStaffCount() {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'staff'";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                System.out.println("Staff count from DB: " + rs.getInt(1)); // <-- Add this line
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting staff count: " + e.getMessage());
+        }
+        return 0;
+    }
+
+}
