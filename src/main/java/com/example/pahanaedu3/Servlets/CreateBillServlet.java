@@ -29,6 +29,14 @@ public class CreateBillServlet extends HttpServlet {
         billService = new BillService();
         customerService = new CustomerService();
         itemService = new ItemService();
+        
+        // Test database connection on servlet initialization
+        System.out.println("=== CREATE BILL SERVLET INITIALIZED ===");
+        try {
+            com.example.pahanaedu3.utils.DatabaseConnection.testDatabaseConnection();
+        } catch (Exception e) {
+            System.err.println("Database connection test failed: " + e.getMessage());
+        }
     }
 
     @Override
@@ -86,7 +94,31 @@ public class CreateBillServlet extends HttpServlet {
             Bill bill = new Bill();
             bill.setCustomerId(customerId);
             bill.setStatus("unpaid");
-            System.out.println("Bill object created with customer ID: " + customerId + ", status: unpaid");
+            bill.setBillDate(new java.util.Date());
+            
+            // Calculate totals
+            double subtotal = 0.0;
+            if (itemIds != null) {
+                for (int i = 0; i < itemIds.length; i++) {
+                    if (itemIds[i] != null && !itemIds[i].trim().isEmpty()) {
+                        int quantity = Integer.parseInt(quantities[i]);
+                        double unitPrice = Double.parseDouble(unitPrices[i]);
+                        subtotal += quantity * unitPrice;
+                    }
+                }
+            }
+            double tax = subtotal * 0.05; // 5% tax
+            double total = subtotal + tax;
+            
+            bill.setSubtotal(subtotal);
+            bill.setTax(tax);
+            bill.setTotal(total);
+            
+            // Get next bill number
+            String billNumber = billService.getNextBillNumber();
+            bill.setBillNumber(billNumber);
+            
+            System.out.println("Bill object created with customer ID: " + customerId + ", status: unpaid, subtotal: " + subtotal + ", tax: " + tax + ", total: " + total + ", bill number: " + billNumber);
 
             // Create bill items
             System.out.println("Creating bill items...");
@@ -99,6 +131,13 @@ public class CreateBillServlet extends HttpServlet {
                         item.setItemId(Integer.parseInt(itemIds[i]));
                         item.setQuantity(Integer.parseInt(quantities[i]));
                         item.setUnitPrice(Double.parseDouble(unitPrices[i]));
+                        
+                        // Calculate total for this item
+                        int quantity = Integer.parseInt(quantities[i]);
+                        double unitPrice = Double.parseDouble(unitPrices[i]);
+                        double itemTotal = quantity * unitPrice;
+                        item.setTotal(itemTotal);
+                        
                         billItems.add(item);
                         System.out.println("Added bill item: " + item);
                     }
@@ -118,15 +157,16 @@ public class CreateBillServlet extends HttpServlet {
                 return;
             } else {
                 response.sendRedirect("bill");
+                return;
             }
 
         } catch (Exception e) {
             request.setAttribute("error", "Error creating bill: " + e.getMessage());
+            // Only forward if no redirect has occurred
+            request.setAttribute("customers", customerService.getAllCustomers());
+            request.setAttribute("items", itemService.getAllItems());
+            request.getRequestDispatcher("/create-bill.jsp").forward(request, response);
+            return;
         }
-
-        // Reload form data for error cases
-        request.setAttribute("customers", customerService.getAllCustomers());
-        request.setAttribute("items", itemService.getAllItems());
-        request.getRequestDispatcher("/create-bill.jsp").forward(request, response);
     }
 }

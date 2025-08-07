@@ -30,12 +30,12 @@ public class BillServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        
+
         if ("get".equals(action)) {
             // Handle AJAX request to get individual bill data
             int billId = Integer.parseInt(request.getParameter("id"));
             Bill bill = billService.getBillById(billId);
-            
+
             if (bill != null) {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
@@ -46,7 +46,7 @@ public class BillServlet extends HttpServlet {
             }
             return;
         }
-        
+
         String search = request.getParameter("search");
         List<Bill> bills;
         if (search != null && !search.trim().isEmpty()) {
@@ -67,7 +67,7 @@ public class BillServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         String msg = null;
-        
+
         if ("delete".equals(action)) {
             int billId = Integer.parseInt(request.getParameter("id"));
             boolean success = billService.deleteBill(billId);
@@ -81,15 +81,15 @@ public class BillServlet extends HttpServlet {
             double tax = Double.parseDouble(request.getParameter("tax"));
             double total = Double.parseDouble(request.getParameter("total"));
             String status = request.getParameter("status");
-            
+
             // Convert string date to Date object
             java.sql.Date billDate = java.sql.Date.valueOf(billDateStr);
-            
-            Bill bill = new Bill(id, billNumber, customerId, billDate, subtotal, tax, total, status);
+
+            Bill bill = new Bill(id, billNumber, customerId, billDate, subtotal, tax, total, status, null, null, null);
             boolean success = billService.updateBill(bill);
             msg = success ? "Bill updated successfully!" : "Failed to update bill.";
         }
-        
+
         // PRG pattern: Redirect to GET with message
         response.sendRedirect("bill?msg=" + java.net.URLEncoder.encode(msg, "UTF-8"));
     }

@@ -1,136 +1,141 @@
 package com.example.pahanaedu3.Services;
 
-
 import java.util.Date;
 import java.util.List;
 
 import com.example.pahanaedu3.DAO.BillDAO;
 import com.example.pahanaedu3.DAO.BillItemDAO;
+import com.example.pahanaedu3.DAO.ItemDAO;
 import com.example.pahanaedu3.Models.Bill;
 import com.example.pahanaedu3.Models.BillItem;
+import com.example.pahanaedu3.Models.Item;
 
-// BillService provides business logic for Bill operations.
-// OOP: Abstraction (service layer), Composition (uses BillDAO and BillItemDAO), Separation of Concerns
+// BillService provides business logic for bill operations.
+// OOP: Abstraction (hides DAO details), Composition (uses BillDAO), Separation of Concerns (Service layer)
 public class BillService {
-    private BillDAO billDAO;
-    private BillItemDAO billItemDAO;
+    private final BillDAO billDAO;
+    private final BillItemDAO billItemDAO;
+    private final ItemDAO itemDAO;
 
     public BillService() {
         this.billDAO = new BillDAO();
         this.billItemDAO = new BillItemDAO();
+        this.itemDAO = new ItemDAO();
     }
 
-    // Create a new bill with items
     public boolean createBill(Bill bill, List<BillItem> billItems) {
-        System.out.println("=== STARTING BILL CREATION ===");
-        try {
-            // Generate bill number
-            String billNumber = billDAO.getNextBillNumber();
-            bill.setBillNumber(billNumber);
-            System.out.println("Generated bill number: " + billNumber);
-
-            // Set current date
-            bill.setBillDate(new Date());
-            System.out.println("Set bill date: " + bill.getBillDate());
-
-            // Calculate totals
-            calculateBillTotals(bill, billItems);
-            System.out.println("Calculated totals - Subtotal: " + bill.getSubtotal() + ", Tax: " + bill.getTax() + ", Total: " + bill.getTotal());
-
-            // Save bill and get the generated ID
-            System.out.println("About to save bill to database...");
-            int billId = billDAO.addBill(bill);
-            System.out.println("Bill saved with ID: " + billId);
-            if (billId == -1) {
-                System.err.println("Failed to save bill");
-                return false;
-            }
-
-            // Set the bill ID
-            bill.setId(billId);
-            System.out.println("Bill ID set to: " + bill.getId());
-
-            // Save bill items
-            System.out.println("Saving " + billItems.size() + " bill items");
+        int billId = billDAO.addBill(bill);
+        if (billId > 0) {
             boolean allItemsSaved = true;
             for (BillItem item : billItems) {
-                item.setBillId(billId);
-                System.out.println("About to save item: " + item.getItemId() + " with billId: " + item.getBillId());
+                item.setBillId(billId); // Set the generated bill ID
                 boolean itemSaved = billItemDAO.addBillItem(item);
-                System.out.println("Saving item " + item.getItemId() + " - Success: " + itemSaved);
                 if (!itemSaved) {
-                    System.err.println("Failed to save bill item: " + item.getItemId());
                     allItemsSaved = false;
                 }
             }
-
-            if (allItemsSaved) {
-                System.out.println("Bill creation completed successfully");
-                System.out.println("=== BILL CREATION SUCCESS ===");
-                return true;
-            } else {
-                System.out.println("Bill created but some items failed to save");
-                System.out.println("=== BILL CREATION SUCCESS (WITH ITEM FAILURES) ===");
-                return true; // Return true anyway since bill was created
-            }
-        } catch (Exception e) {
-            System.err.println("Error in createBill: " + e.getMessage());
-            e.printStackTrace();
-            System.out.println("=== BILL CREATION FAILED ===");
-            return false;
+            return allItemsSaved;
         }
+        return false;
     }
 
-    // Get all bills
     public List<Bill> getAllBills() {
         return billDAO.getAllBills();
     }
 
-    // Get bill by ID
     public Bill getBillById(int id) {
         return billDAO.getBillById(id);
     }
 
-    // Update bill
+    public List<BillItem> getBillItems(int billId) {
+        return billItemDAO.getBillItemsByBillId(billId);
+    }
+
+    public List<Bill> searchBills(String searchQuery) {
+        return billDAO.searchBills(searchQuery);
+    }
+
     public boolean updateBill(Bill bill) {
         return billDAO.updateBill(bill);
     }
 
-    // Delete bill
-    public boolean deleteBill(int id) {
-        // First delete bill items
-        billItemDAO.deleteBillItemsByBillId(id);
-        // Then delete bill
-        return billDAO.deleteBill(id);
-    }
+    // Process payment and update inventory
+    public boolean processPayment(int billId, String paymentMethod, String paymentReference) {
+        try {
+            // 1. Get the bill
+            Bill bill = billDAO.getBillById(billId);
+            if (bill == null) {
+                return false;
+            }
 
-    // Calculate bill totals
-    private void calculateBillTotals(Bill bill, List<BillItem> billItems) {
-        double subtotal = 0.0;
+            // 2. Update bill status to paid
+            bill.setStatus("paid");
+            bill.setPaymentMethod(paymentMethod);
+            bill.setPaymentDate(new Date());
+            bill.setPaymentReference(paymentReference);
 
-        for (BillItem item : billItems) {
-            item.setTotal(item.getQuantity() * item.getUnitPrice());
-            subtotal += item.getTotal();
+            boolean billUpdated = billDAO.updateBill(bill);
+            if (!billUpdated) {
+                return false;
+            }
+
+            // 3. Update inventory quantities
+            List<BillItem> billItems = billItemDAO.getBillItemsByBillId(billId);
+            for (BillItem billItem : billItems) {
+                Item item = itemDAO.getItemById(billItem.getItemId());
+                if (item != null) {
+                    // Reduce quantity by the amount ordered
+                    int newQuantity = item.getQuantity() - billItem.getQuantity();
+                    if (newQuantity < 0) {
+                        // Insufficient stock - rollback payment
+                        bill.setStatus("unpaid");
+                        bill.setPaymentMethod(null);
+                        bill.setPaymentDate(null);
+                        bill.setPaymentReference(null);
+                        billDAO.updateBill(bill);
+                        return false;
+                    }
+                    item.setQuantity(newQuantity);
+                    itemDAO.updateItem(item);
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-
-        bill.setSubtotal(subtotal);
-
-        // Calculate tax (5%)
-        double tax = subtotal * 0.05;
-        bill.setTax(tax);
-
-        // Calculate total
-        double total = subtotal + tax;
-        bill.setTotal(total);
     }
 
-    // Get bill items by bill ID
-    public List<BillItem> getBillItemsByBillId(int billId) {
-        return billItemDAO.getBillItemsByBillId(billId);
+    // Check if bill can be paid (sufficient stock)
+    public boolean canProcessPayment(int billId) {
+        try {
+            List<BillItem> billItems = billItemDAO.getBillItemsByBillId(billId);
+            for (BillItem billItem : billItems) {
+                Item item = itemDAO.getItemById(billItem.getItemId());
+                if (item == null || item.getQuantity() < billItem.getQuantity()) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    // Search bills by bill number or customer
-    public List<Bill> searchBills(String searchQuery) {
-        return billDAO.searchBills(searchQuery);
+    // Get payment status
+    public String getPaymentStatus(int billId) {
+        Bill bill = billDAO.getBillById(billId);
+        return bill != null ? bill.getStatus() : "unknown";
+    }
+
+    public boolean deleteBill(int billId) {
+        return billDAO.deleteBill(billId);
+    }
+    
+    // Get next bill number
+    public String getNextBillNumber() {
+        return billDAO.getNextBillNumber();
     }
 }

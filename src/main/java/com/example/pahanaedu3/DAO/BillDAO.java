@@ -21,11 +21,7 @@ public class BillDAO {
 
     // Add a new bill
     public int addBill(Bill bill) {
-        System.out.println("=== STARTING BILL ADD ===");
         String sql = "INSERT INTO bills (bill_number, customer_id, bill_date, subtotal, tax, total, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        System.out.println("SQL: " + sql);
-        System.out.println("Bill data - Number: " + bill.getBillNumber() + ", Customer: " + bill.getCustomerId() + ", Date: " + bill.getBillDate() + ", Subtotal: " + bill.getSubtotal() + ", Tax: " + bill.getTax() + ", Total: " + bill.getTotal() + ", Status: " + bill.getStatus());
-        
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, bill.getBillNumber());
@@ -35,33 +31,18 @@ public class BillDAO {
             pstmt.setDouble(5, bill.getTax());
             pstmt.setDouble(6, bill.getTotal());
             pstmt.setString(7, bill.getStatus());
-            
-            System.out.println("About to execute update...");
             int rows = pstmt.executeUpdate();
-            System.out.println("Rows affected: " + rows);
-            
+
             if (rows > 0) {
                 try (java.sql.ResultSet rs = pstmt.getGeneratedKeys()) {
                     if (rs.next()) {
-                        int generatedId = rs.getInt(1);
-                        System.out.println("Generated ID: " + generatedId);
-                        System.out.println("=== BILL ADD SUCCESS ===");
-                        return generatedId;
-                    } else {
-                        System.err.println("No generated keys returned");
-                        System.out.println("=== BILL ADD FAILED (NO GENERATED KEY) ===");
-                        return -1;
+                        return rs.getInt(1);
                     }
                 }
-            } else {
-                System.err.println("No rows were affected");
-                System.out.println("=== BILL ADD FAILED (NO ROWS AFFECTED) ===");
-                return -1;
             }
+            return -1;
         } catch (SQLException e) {
             System.err.println("Error adding bill: " + e.getMessage());
-            e.printStackTrace();
-            System.out.println("=== BILL ADD FAILED (SQL EXCEPTION) ===");
             return -1;
         }
     }
@@ -82,7 +63,10 @@ public class BillDAO {
                         rs.getDouble("subtotal"),
                         rs.getDouble("tax"),
                         rs.getDouble("total"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        null, // paymentMethod
+                        null, // paymentDate
+                        null  // paymentReference
                 );
                 bills.add(bill);
             }
@@ -108,7 +92,10 @@ public class BillDAO {
                             rs.getDouble("subtotal"),
                             rs.getDouble("tax"),
                             rs.getDouble("total"),
-                            rs.getString("status")
+                            rs.getString("status"),
+                            null, // paymentMethod
+                            null, // paymentDate
+                            null  // paymentReference
                     );
                 }
             }
@@ -189,7 +176,10 @@ public class BillDAO {
                             rs.getDouble("subtotal"),
                             rs.getDouble("tax"),
                             rs.getDouble("total"),
-                            rs.getString("status")
+                            rs.getString("status"),
+                            null, // paymentMethod
+                            null, // paymentDate
+                            null  // paymentReference
                     );
                     bills.add(bill);
                 }

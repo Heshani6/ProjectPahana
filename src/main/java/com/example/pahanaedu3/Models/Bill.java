@@ -14,12 +14,15 @@ public class Bill {
     private double tax;
     private double total;
     private String status; // "paid" or "unpaid"
+    private String paymentMethod; // "cash", "card", "online"
+    private Date paymentDate;
+    private String paymentReference; // For tracking payment transactions
 
 
     public Bill() {}
 
     // Constructor with parameters for full initialization
-    public Bill(int id, String billNumber, int customerId, Date billDate, double subtotal, double tax, double total, String status) {
+    public Bill(int id, String billNumber, int customerId, Date billDate, double subtotal, double tax, double total, String status, String paymentMethod, Date paymentDate, String paymentReference) {
         this.id = id;
         this.billNumber = billNumber;
         this.customerId = customerId;
@@ -28,10 +31,13 @@ public class Bill {
         this.tax = tax;
         this.total = total;
         this.status = status;
+        this.paymentMethod = paymentMethod;
+        this.paymentDate = paymentDate;
+        this.paymentReference = paymentReference;
     }
 
     // Constructor without ID (for creating new bills)
-    public Bill(String billNumber, int customerId, Date billDate, double subtotal, double tax, double total, String status) {
+    public Bill(String billNumber, int customerId, Date billDate, double subtotal, double tax, double total, String status, String paymentMethod, Date paymentDate, String paymentReference) {
         this.billNumber = billNumber;
         this.customerId = customerId;
         this.billDate = billDate;
@@ -39,6 +45,9 @@ public class Bill {
         this.tax = tax;
         this.total = total;
         this.status = status;
+        this.paymentMethod = paymentMethod;
+        this.paymentDate = paymentDate;
+        this.paymentReference = paymentReference;
     }
 
     // Encapsulation: Public getters and setters
@@ -66,6 +75,15 @@ public class Bill {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public Date getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(Date paymentDate) { this.paymentDate = paymentDate; }
+
+    public String getPaymentReference() { return paymentReference; }
+    public void setPaymentReference(String paymentReference) { this.paymentReference = paymentReference; }
+
     // Polymorphism: Overriding toString for custom string representation
     @Override
     public String toString() {
@@ -78,6 +96,9 @@ public class Bill {
                 ", tax=" + tax +
                 ", total=" + total +
                 ", status='" + status + '\'' +
+                ", paymentMethod='" + paymentMethod + '\'' +
+                ", paymentDate=" + paymentDate +
+                ", paymentReference='" + paymentReference + '\'' +
                 '}';
     }
 }
