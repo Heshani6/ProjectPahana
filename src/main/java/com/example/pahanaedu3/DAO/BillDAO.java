@@ -189,4 +189,18 @@ public class BillDAO {
         }
         return bills;
     }
+
+    public int getPendingBillCount() {
+        String sql = "SELECT COUNT(*) FROM bills WHERE status = 'unpaid'";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting pending bill count: " + e.getMessage());
+        }
+        return 0;
+    }
 }

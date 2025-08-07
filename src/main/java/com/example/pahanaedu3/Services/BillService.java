@@ -138,4 +138,8 @@ public class BillService {
     public String getNextBillNumber() {
         return billDAO.getNextBillNumber();
     }
+
+    public int getPendingBillCount() {
+        return billDAO.getPendingBillCount();
+    }
 }
