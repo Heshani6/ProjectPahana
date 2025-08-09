@@ -42,9 +42,8 @@ public class LoginServlet extends HttpServlet {
         }
 
         // Forward to login page
-        request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -58,7 +57,7 @@ public class LoginServlet extends HttpServlet {
         if (username == null || username.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Username and password are required");
-            request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+            request.getRequestDispatcher("index.jsp").forward(request, response);
             return;
         }
 
@@ -74,19 +73,21 @@ public class LoginServlet extends HttpServlet {
 
             // Redirect based on role
             if ("admin".equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect("admin-dashboard.jsp");
+                response.sendRedirect("admin-dashboard");
             } else if ("staff".equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect("staff-dashboard.jsp");
-
-
-                } else{
-                    // Login failed
-                    request.setAttribute("error", "Invalid username or password");
-                    request.setAttribute("username", username);
-                    request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
-                }
+                response.sendRedirect("staff-dashboard");
             }
+        } else {
+            // Check if username exists for better error message
+            if (userService.usernameExists(username)) {
+                request.setAttribute("error", "Incorrect password");
+            } else {
+                request.setAttribute("error", "Incorrect username");
+            }
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("index.jsp").forward(request, response);
         }
+    }
 
 
 
