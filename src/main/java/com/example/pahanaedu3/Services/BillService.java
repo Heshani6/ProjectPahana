@@ -32,12 +32,28 @@ public class BillService {
                 boolean itemSaved = billItemDAO.addBillItem(item);
                 if (!itemSaved) {
                     allItemsSaved = false;
+                    // Optional: break here and rollback if you're handling transactions
+                } else {
+                    // ✅ Deduct item quantity from stock
+                    Item dbItem = itemDAO.getItemById(item.getItemId());
+                    if (dbItem != null) {
+                        int currentStock = dbItem.getQuantity();
+                        int newStock = currentStock - item.getQuantity();
+                        if (newStock < 0) {
+                            // Insufficient stock — reject the bill (Optional)
+                            System.err.println("Not enough stock for item ID: " + item.getItemId());
+                            return false;
+                        }
+                        dbItem.setQuantity(newStock);
+                        itemDAO.updateItem(dbItem);
+                    }
                 }
             }
             return allItemsSaved;
         }
         return false;
     }
+
 
     public List<Bill> getAllBills() {
         return billDAO.getAllBills();
