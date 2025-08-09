@@ -174,10 +174,18 @@
       background: #f2f2f2;
     }
 
-    /* ========== Action Buttons Container ========== */
+
+    /* ========== Actions Button Group ========== */
     .actions {
       display: flex;
       gap: 6px;
+    }
+
+    /* ========== Compact Action Buttons ========== */
+    .actions .btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      gap: 4px;
     }
 
 
@@ -249,11 +257,23 @@
     .toast.error {
       background: #c0392b;
     }
+    
+
 
   </style>
 </head>
 <body>
-<a href="admin-dashboard.jsp" class="back-arrow" title="Back to Admin Dashboard">
+<%
+  String backUrl = "dashboard";
+  String role = (String) session.getAttribute("role");
+  if ("admin".equals(role)) {
+    backUrl = "admin-dashboard.jsp";
+  } else if ("staff".equals(role)) {
+    backUrl= "staff-dashboard.jsp";
+
+  }
+%>
+<a href="<%= backUrl %>" class="back-arrow" title="Back to Dashboard">
   &#8592;
 </a>
 <div class="container">
@@ -262,7 +282,7 @@
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="search-section">
-      <input type="text" class="search-input" placeholder="Search items by name..." id="searchInput" onkeypress="handleSearchKeyPress(event)">
+      <input type="text" class="search-input" placeholder="Search items by name..." id="searchInput" value="<%= request.getParameter("search") != null ? request.getParameter("search") : "" %>" onkeypress="handleSearchKeyPress(event)">
       <button type="button" class="btn btn-search" onclick="searchItems()">
         <i class="fas fa-search"></i> Search
       </button>
@@ -270,7 +290,7 @@
         <i class="fas fa-times"></i> Clear
       </button>
     </div>
-    <a href="add-item.jsp" class="btn btn-success">
+    <a href="item?page=add" class="btn btn-success">
       <i class="fas fa-plus"></i> Add Item
     </a>
   </div>
@@ -291,7 +311,7 @@
     <tr>
       <td><%= item.getId() %></td>
       <td><%= item.getName() %></td>
-      <td><%= item.getCategoryName() %></td>
+      <td title="Combined categories: <%= item.getCategoryName() %>"><%= item.getCategoryName() %></td>
       <td><%= item.getPrice() %></td>
       <td><%= item.getQuantity() %></td>
       <td class="actions">
@@ -301,11 +321,10 @@
         <button class="btn btn-edit" onclick="openEditModal('<%= item.getId() %>', '<%= item.getName().replace("'", "\\'") %>', '<%= item.getCategoryName().replace("'", "\\'") %>', '<%= item.getPrice() %>', '<%= item.getQuantity() %>')">
           <i class="fas fa-pencil"></i> Edit
         </button>
-        <form action="item" method="post" style="display:inline;" onsubmit="return confirm('Delete this item?');">
-          <input type="hidden" name="action" value="delete" />
-          <input type="hidden" name="id" value="<%= item.getId() %>" />
-          <button type="submit" class="btn btn-delete">
-            <i class="fas fa-trash"></i> Delete
+        <%-- Show Delete only for admin users --%>
+        <% if ("admin".equalsIgnoreCase(role)) { %>
+        <button class="btn btn-delete" onclick="openDeleteModal('<%= item.getId() %>', '<%= item.getName() %>')">Delete</button>
+        <% } %>
           </button>
         </form>
       </td>
@@ -411,14 +430,17 @@
   <% } %>
 
   function searchItems() {
-    const searchTerm = document.getElementById('searchInput').value;
-    // Implement search functionality
-    console.log('Searching for:', searchTerm);
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    if (searchTerm) {
+      window.location.href = 'item?search=' + encodeURIComponent(searchTerm);
+    } else {
+      showToast('Please enter a search term.', 'error');
+    }
   }
 
   function clearSearch() {
     document.getElementById('searchInput').value = '';
-    // Implement clear functionality
+    window.location.href = 'item';
   }
 
   function handleSearchKeyPress(event) {

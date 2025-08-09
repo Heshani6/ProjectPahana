@@ -37,4 +37,8 @@ public class ItemService {
     public Item getItemById(int id) {
         return itemDAO.getItemById(id);
     }
+
+    public int getItemCount() {
+        return itemDAO.getItemCount();
+    }
 }
