@@ -64,10 +64,33 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
             response.sendRedirect("user?msg=" + java.net.URLEncoder.encode(msg, "UTF-8"));
             return;
 
+        } else if ("register".equals(action)) {   // 🔹 Sign-up handler
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String role = request.getParameter("role");
+
+            // 🔹 Check if username already exists
+            User existingUser = userService.getUserByUsername(username);
+            if (existingUser != null) {
+                request.setAttribute("error", "User with this username already exists");
+                request.getRequestDispatcher("signup.jsp").forward(request, response);
+                return;
+            }
+
+            // 🔹 If not exists, create new user
+            boolean success = userService.addUser(username, role, password);
+            if (success) {
+                response.sendRedirect("login.jsp?msg=" + java.net.URLEncoder.encode("Account created successfully! Please login.", "UTF-8"));
+            } else {
+                request.setAttribute("error", "Failed to register. Try again.");
+                request.getRequestDispatcher("signup.jsp").forward(request, response);
+            }
+            return;
         } else {
             response.sendRedirect("user");
         }
     }
+
 
 
 

@@ -47,43 +47,39 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Polymorphism: doPost overrides the parent class method to provide specific behavior
-        // Abstraction: Delegates authentication logic to UserService
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        // Validate input
+        // ✅ Test 04: Empty fields
         if (username == null || username.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Username and password are required");
+            request.setAttribute("error", "Fields cannot be empty"); // Changed wording
             request.getRequestDispatcher("index.jsp").forward(request, response);
             return;
         }
 
-        // Authenticate user
         User user = userService.login(username, password);
 
         if (user != null) {
-            // Login successful
+            // ✅ Session setup
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("username", user.getUsername());
             session.setAttribute("role", user.getRole());
 
-            // Redirect based on role
+            // ✅ Test 05: Session timeout (15 min)
+            session.setMaxInactiveInterval(900);
+
+            // ✅ Redirect based on role
             if ("admin".equalsIgnoreCase(user.getRole())) {
                 response.sendRedirect("admin-dashboard");
             } else if ("staff".equalsIgnoreCase(user.getRole())) {
                 response.sendRedirect("staff-dashboard");
             }
         } else {
-            // Check if username exists for better error message
-            if (userService.usernameExists(username)) {
-                request.setAttribute("error", "Incorrect password");
-            } else {
-                request.setAttribute("error", "Incorrect username");
-            }
+            // ✅ Test 03: Invalid credentials message
+            request.setAttribute("error", "Invalid Username or Password, Please try Again");
             request.setAttribute("username", username);
             request.getRequestDispatcher("index.jsp").forward(request, response);
         }
@@ -92,4 +88,5 @@ public class LoginServlet extends HttpServlet {
 
 
 
-    }
+
+}

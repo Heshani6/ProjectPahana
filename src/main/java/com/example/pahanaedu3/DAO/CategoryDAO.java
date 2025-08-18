@@ -14,16 +14,18 @@ public class CategoryDAO {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
+    // Get all categories
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT id, name FROM categories ORDER BY id";
+        String sql = "SELECT id, name, description FROM categories ORDER BY id";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Category category = new Category(
                         rs.getInt("id"),
-                        rs.getString("name")
+                        rs.getString("name"),
+                        rs.getString("description")
                 );
                 categories.add(category);
             }
@@ -33,8 +35,9 @@ public class CategoryDAO {
         return categories;
     }
 
+    // Get category by ID
     public Category getCategoryById(int id) {
-        String sql = "SELECT id, name FROM categories WHERE id = ?";
+        String sql = "SELECT id, name, description FROM categories WHERE id = ?";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
@@ -42,7 +45,8 @@ public class CategoryDAO {
                 if (rs.next()) {
                     return new Category(
                             rs.getInt("id"),
-                            rs.getString("name")
+                            rs.getString("name"),
+                            rs.getString("description")
                     );
                 }
             }
@@ -52,11 +56,13 @@ public class CategoryDAO {
         return null;
     }
 
+    // Add new category
     public boolean addCategory(Category category) {
-        String sql = "INSERT INTO categories (name) VALUES (?)";
+        String sql = "INSERT INTO categories (name, description) VALUES (?, ?)";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
+            pstmt.setString(2, category.getDescription());
             int rows = pstmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
@@ -65,12 +71,14 @@ public class CategoryDAO {
         }
     }
 
+    // Update category
     public boolean updateCategory(Category category) {
-        String sql = "UPDATE categories SET name = ? WHERE id = ?";
+        String sql = "UPDATE categories SET name = ?, description = ? WHERE id = ?";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
-            pstmt.setInt(2, category.getId());
+            pstmt.setString(2, category.getDescription());
+            pstmt.setInt(3, category.getId());
             int rows = pstmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
@@ -79,6 +87,7 @@ public class CategoryDAO {
         }
     }
 
+    // Delete category
     public boolean deleteCategory(int id) {
         String sql = "DELETE FROM categories WHERE id = ?";
         try (Connection conn = dbConnection.getConnection();
@@ -92,6 +101,7 @@ public class CategoryDAO {
         }
     }
 
+    // Check if category name already exists
     public boolean categoryNameExists(String name) {
         String sql = "SELECT COUNT(*) FROM categories WHERE name = ?";
         try (Connection conn = dbConnection.getConnection();

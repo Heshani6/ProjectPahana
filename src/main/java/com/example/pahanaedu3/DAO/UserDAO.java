@@ -117,20 +117,25 @@ public class UserDAO {
     }
 
     // Creates a new user in the database
-    public boolean createUser(String username, String password, String role) {
-        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            pstmt.setString(3, role);
-            int rows = pstmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("Error creating user: " + e.getMessage());
+
+
+        // ✅ Create User
+        public boolean createUser(String username, String password, String role) {
+            String query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+            try (Connection conn = dbConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                stmt.setString(3, role);
+
+                return stmt.executeUpdate() > 0;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             return false;
         }
-    }
+
 
     public User getUserById(int id) {
         String sql = "SELECT id, username, password, role FROM users WHERE id = ?";

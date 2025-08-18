@@ -14,7 +14,7 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #7f7fd5, #86a8e7, #91eae4);
+      background-image: url('image/buddish-shop.jpg');
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -23,7 +23,7 @@
 
     .container {
       text-align: center;
-      background: white;
+      background: rgba(255, 255, 255, 0.85);
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -72,7 +72,7 @@
     }
     .form-group input {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.75rem 0.01rem;
       border: 2px solid #e1e5e9;
       border-radius: 5px;
       font-size: 1rem;
@@ -176,7 +176,7 @@
       <input type="checkbox" id="staff" name="role" value="staff" />
       <label for="staff">Staff</label>
     </div>
-    <button type="submit" class="register-btn">Register</button>
+    <button type="submit" class="register-btn">Sign Up</button>
     <div class="register-link">
       Already have an account? <a href="index.jsp">Sign In</a>
     </div>

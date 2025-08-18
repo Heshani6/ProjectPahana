@@ -72,6 +72,12 @@ public class UserService {
     public int getStaffCount() {
         return userDAO.getStaffCount();
     }
+
+    public boolean addUser(String username, String role, String password) {
+        return createUser(username, password, role);
+    }
+
+
 }
 
 

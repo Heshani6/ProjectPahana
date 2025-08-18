@@ -13,13 +13,23 @@ public class CustomerService {
     public CustomerService() {
         this.customerDAO = new CustomerDAO();
     }
-    // Add a customer
+
+
+    // Add a customer with duplicate account number check
     public boolean addCustomer(Customer customer) {
         if (customer == null || customer.getAccountNumber() == null || customer.getAccountNumber().trim().isEmpty()) {
             return false;
         }
+
+        // ✅ Prevent duplicate account numbers
+        if (customerDAO.accountNumberExists(customer.getAccountNumber())) {
+            System.out.println("Duplicate account number detected: " + customer.getAccountNumber());
+            return false; // reject duplicate
+        }
+
         return customerDAO.addCustomer(customer);
     }
+
 
     // Get a customer by ID
     public Customer getCustomerById(int id) {
@@ -40,7 +50,6 @@ public class CustomerService {
 
         return customerDAO.updateCustomer(customer);
     }
-
 
     // Delete a customer
     public boolean deleteCustomer(int id) {
@@ -70,6 +79,7 @@ public class CustomerService {
         }
         return customerDAO.searchCustomersByAccountNumber(accountNumber.trim());
     }
+
     public int getCustomerCount() {
         return customerDAO.getCustomerCount();
     }

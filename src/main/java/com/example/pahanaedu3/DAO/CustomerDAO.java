@@ -143,7 +143,7 @@ public class CustomerDAO {
     }
 
     public boolean accountNumberExists(String accountNumber) {
-        String sql = "SELECT COUNT(*) FROM customers WHERE account_number = ?";
+        String sql = "SELECT COUNT(*) FROM customers WHERE TRIM(LOWER(account_number)) = LOWER(TRIM(?))";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, accountNumber);
@@ -157,6 +157,7 @@ public class CustomerDAO {
         }
         return false;
     }
+
 
     public List<Customer> searchCustomersByAccountNumber(String accountNumber) {
         List<Customer> customers = new ArrayList<>();

@@ -293,12 +293,12 @@
                 margin: 20px auto;
                 padding: 20px;
             }
-            
+
             .item-row {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
-            
+
             .items-header {
                 flex-direction: column;
                 align-items: stretch;
@@ -357,7 +357,7 @@
                         <i class="fas fa-plus"></i> Add Item
                     </button>
                 </div>
-                
+
                 <div id="itemsContainer">
                     <!-- Item rows will be added here dynamically -->
                 </div>
@@ -370,8 +370,8 @@
                     <span id="subtotal">Rs 0.00</span>
                 </div>
                 <div class="total-row">
-                    <span>Tax (5%):</span>
-                    <span id="tax">Rs 0.00</span>
+                    <span>Discount (5%):</span>
+                    <span id="discount">Rs 0.00</span>
                 </div>
                 <div class="total-row">
                     <span>Total:</span>
@@ -411,20 +411,20 @@
             const row = document.createElement('div');
             row.className = 'item-row';
             row.id = 'item-row-' + itemCounter;
-            
+
             // Create the select element
             const select = document.createElement('select');
             select.name = 'itemId';
             select.className = 'form-control';
             select.setAttribute('onchange', 'updatePrice(' + itemCounter + ')');
             select.required = true;
-            
+
             // Add default option
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Select item...';
             select.appendChild(defaultOption);
-            
+
             // Add item options
             items.forEach(function(item) {
                 const option = document.createElement('option');
@@ -433,7 +433,7 @@
                 option.textContent = item.name + ' - Rs' + item.price;
                 select.appendChild(option);
             });
-            
+
             // Create quantity input
             const quantityInput = document.createElement('input');
             quantityInput.type = 'number';
@@ -443,7 +443,7 @@
             quantityInput.value = '1';
             quantityInput.setAttribute('onchange', 'calculateRowTotal(' + itemCounter + ')');
             quantityInput.required = true;
-            
+
             // Create price input
             const priceInput = document.createElement('input');
             priceInput.type = 'number';
@@ -451,26 +451,26 @@
             priceInput.placeholder = 'Price';
             priceInput.step = '0.01';
             priceInput.readOnly = true;
-            
+
             // Create total span
             const totalSpan = document.createElement('span');
             totalSpan.className = 'row-total';
             totalSpan.textContent = 'Rs 0.00';
-            
+
             // Create remove button
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'btn btn-danger';
             removeBtn.setAttribute('onclick', 'removeItemRow(' + itemCounter + ')');
             removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
-            
+
             // Append all elements to row
             row.appendChild(select);
             row.appendChild(quantityInput);
             row.appendChild(priceInput);
             row.appendChild(totalSpan);
             row.appendChild(removeBtn);
-            
+
             container.appendChild(row);
             itemCounter++;
         }
@@ -482,13 +482,13 @@
                 calculateTotals();
             }
         }
-            
+
         function updatePrice(index) {
             const row = document.getElementById('item-row-' + index);
             const select = row.querySelector('select');
             const priceInput = row.querySelector('input[name="unitPrice"]');
             const option = select.options[select.selectedIndex];
-            
+
             if (option.value) {
                 priceInput.value = option.getAttribute('data-price');
                 calculateRowTotal(index);
@@ -500,7 +500,7 @@
             const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
             const price = parseFloat(row.querySelector('input[name="unitPrice"]').value) || 0;
             const total = quantity * price;
-            
+
             row.querySelector('.row-total').textContent = 'Rs' + total.toFixed(2);
             calculateTotals();
         }
@@ -508,38 +508,38 @@
         function calculateTotals() {
             let subtotal = 0;
             const rows = document.querySelectorAll('.item-row');
-            
+
             rows.forEach(row => {
                 const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
                 const price = parseFloat(row.querySelector('input[name="unitPrice"]').value) || 0;
                 subtotal += quantity * price;
             });
-            
-            const tax = subtotal * 0.05;
-            const total = subtotal + tax;
-            
+
+            const discount = subtotal * 0.05;
+            const total = subtotal - discount;
+
             document.getElementById('subtotal').textContent = 'Rs' + subtotal.toFixed(2);
-            document.getElementById('tax').textContent = 'Rs' + tax.toFixed(2);
+            document.getElementById('discount').textContent = 'Rs' + discount.toFixed(2);
             document.getElementById('total').textContent = 'Rs' + total.toFixed(2);
         }
 
         // Form validation
         document.getElementById('billForm').addEventListener('submit', function(e) {
             console.log('Form submission started...');
-            
+
             const customerId = document.getElementById('customerId').value;
             console.log('Customer ID selected:', customerId);
-            
+
             if (!customerId) {
                 showToast('Please select a customer', 'error');
                 e.preventDefault();
                 return false;
             }
-            
+
             const itemRows = document.querySelectorAll('.item-row');
             let hasItems = false;
             let itemCount = 0;
-            
+
             itemRows.forEach(row => {
                 const itemId = row.querySelector('select[name="itemId"]').value;
                 const quantity = row.querySelector('input[name="quantity"]').value;
@@ -550,15 +550,15 @@
                     itemCount++;
                 }
             });
-            
+
             console.log('Total items selected:', itemCount);
-            
+
             if (!hasItems) {
                 showToast('Please add at least one item', 'error');
                 e.preventDefault();
                 return false;
             }
-            
+
             // If validation passes, allow form submission
             console.log('Form validation passed, submitting form...');
             console.log('Form action:', this.action);
@@ -571,7 +571,7 @@
             toast.textContent = message;
             toast.className = `toast ${type}`;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);

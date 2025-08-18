@@ -54,7 +54,6 @@ public class RegisterServlet extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirmPassword");
         String[] roles = request.getParameterValues("role");
         String role = (roles != null && roles.length > 0) ? roles[0] : "staff";
         String from = request.getParameter("from");
@@ -62,11 +61,8 @@ public class RegisterServlet extends HttpServlet {
         // Basic validation
         if (username == null || username.trim().isEmpty() ||
             password == null || password.trim().isEmpty() ||
-            confirmPassword == null || confirmPassword.trim().isEmpty() ||
             role == null || role.trim().isEmpty()) {
             request.setAttribute("error", "All fields are required.");
-        } else if (!password.equals(confirmPassword)) {
-            request.setAttribute("error", "Passwords do not match.");
         } else {
             // Delegates business logic to the service layer
             boolean success = userService.createUser(username, password, role);
@@ -76,13 +72,13 @@ public class RegisterServlet extends HttpServlet {
                     request.setAttribute("success", "Staff account created successfully!");
                     request.setAttribute("clearForm", "true"); // Flag to clear form
                     request.setAttribute("autoRedirect", "true"); // Flag to auto-redirect
-                    request.getRequestDispatcher("add-staff.jsp").forward(request, response);
+                    request.getRequestDispatcher("user-management.jsp").forward(request, response);
                     return;
                 } else {
                     // If adding from registration page, show success message and clear form
                     request.setAttribute("success", "Staff account created successfully!");
                     request.setAttribute("clearForm", "true"); // Flag to clear form
-                    request.getRequestDispatcher("add-staff.jsp").forward(request, response);
+                    request.getRequestDispatcher("register.jsp").forward(request, response);
                     return;
                 }
             } else {

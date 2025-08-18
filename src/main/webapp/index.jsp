@@ -8,14 +8,14 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #7f7fd5, #86a8e7, #91eae4);
+      background-image: url('image/buddish-shop.jpg');
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .login-container {
-      background: white;
+      background: rgba(255, 255, 255, 0.85);
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -46,7 +46,7 @@
     }
     .form-group input {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.75rem 0.01rem;
       border: 2px solid #e1e5e9;
       border-radius: 5px;
       font-size: 1rem;
@@ -126,10 +126,10 @@
       <input type="password" id="password" name="password"
              required autocomplete="current-password">
     </div>
-    <button type="submit" class="login-btn">Sign In</button>
+    <button type="submit" class="login-btn">Login</button>
 
     <div class="register-link">
-      Don't have an account? <a href="register.jsp">Register</a>
+      Don't have an account? <a href="register.jsp">Sign Up</a>
     </div>
   </form>
   <div class="footer">
