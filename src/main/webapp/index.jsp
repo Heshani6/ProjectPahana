@@ -114,17 +114,14 @@
     <%= request.getAttribute("error") %>
   </div>
   <% } %>
-  <form action="login" method="post">
+  <form action="login" method="post" autocomplete="off">
     <div class="form-group">
       <label for="username">Username</label>
-      <input type="text" id="username" name="username"
-             value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : "" %>"
-             required autocomplete="username">
+      <input type="text" id="username" name="username" value="" required autocomplete="off">
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input type="password" id="password" name="password"
-             required autocomplete="current-password">
+      <input type="password" id="password" name="password" value="" required autocomplete="new-password">
     </div>
     <button type="submit" class="login-btn">Login</button>
 

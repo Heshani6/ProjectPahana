@@ -11,7 +11,7 @@ public class Item {
     private int quantity;
 
     // Default constructor
-    public Item() {}
+    public Item(int i, String newItem, double v) {}
 
     // Constructor with all fields
     public Item(int id, String name, int categoryId, String categoryName, double price, int quantity) {

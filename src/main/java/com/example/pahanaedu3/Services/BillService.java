@@ -139,7 +139,9 @@ public class BillService {
             return false;
         }
     }
-
+    public interface TotalCalculator {
+        double calculateTotal(double subtotal, double taxOrDiscount);
+    }
     // Get payment status
     public String getPaymentStatus(int billId) {
         Bill bill = billDAO.getBillById(billId);
@@ -158,4 +160,5 @@ public class BillService {
     public int getPendingBillCount() {
         return billDAO.getPendingBillCount();
     }
+
 }

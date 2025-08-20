@@ -162,15 +162,16 @@
     <% } %>
   </div>
 
-  <form action="register" method="post">
+  <form action="register" method="post" autocomplete="off">
     <div class="form-group">
       <label for="username" class="form-label">Username</label>
-      <input type="text" id="username" name="username" required />
+      <input type="text" id="username" name="username" required autocomplete="off" />
     </div>
     <div class="form-group">
       <label for="password" class="form-label">Password</label>
-      <input type="password" id="password" name="password" required />
+      <input type="password" id="password" name="password" required autocomplete="new-password" />
     </div>
+
     <div class="form-group-role">
       <label for="staff">Select Role:</label>
       <input type="checkbox" id="staff" name="role" value="staff" />

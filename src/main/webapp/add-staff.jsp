@@ -118,7 +118,7 @@
   &#8592;
 </a>
 
-  <form class="form-card" action="register" method="post" autocomplete="off">
+  <form class="form-card" action="user" method="post" autocomplete="off">
     <div class="form-title">Add Staff</div>
     <div class="feedback">
       <% if (request.getAttribute("error") != null) { %>
@@ -141,6 +141,7 @@
     </div>
     <input type="hidden" name="role" value="staff">
     <input type="hidden" name="from" value="admin">
+    <input type="hidden" name="action" value="add">
     <button type="submit" class="btn-submit">Create Staff</button>
   </form>
 

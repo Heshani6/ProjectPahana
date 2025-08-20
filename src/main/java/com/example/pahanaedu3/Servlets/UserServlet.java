@@ -21,31 +21,54 @@ public class UserServlet extends HttpServlet {
         userService = new UserService();
     }
 
-    // Handles GET requests: list all users or show a single user for editing
+    // Handles GET requests: list all users or search
     @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String search = request.getParameter("search");
-    List<User> users;
-    if (search != null && !search.trim().isEmpty()) {
-        users = userService.searchUsersByUsername(search.trim());
-    } else {
-        users = userService.getAllUsers();
-    }
-    request.setAttribute("users", users);
-    String msg = request.getParameter("msg");
-    if (msg != null) {
-        request.setAttribute("msg", msg);
-    }
-    request.getRequestDispatcher("user-management.jsp").forward(request, response);
-}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String search = request.getParameter("search");
+        List<User> users;
 
+        if (search != null && !search.trim().isEmpty()) {
+            users = userService.searchUsersByUsername(search.trim());
+        } else {
+            users = userService.getAllUsers();
+        }
+
+        request.setAttribute("users", users);
+
+        String msg = request.getParameter("msg");
+        if (msg != null) {
+            request.setAttribute("msg", msg);
+        }
+
+        request.getRequestDispatcher("user-management.jsp").forward(request, response);
+    }
+
+    // Handles POST requests: add, update, delete, register
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
 
-        if ("update".equals(action)) {
+        if ("add".equals(action)) {
+            // ✅ Add Staff (from add-staff.jsp)
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String role = request.getParameter("role");
+
+            boolean success = userService.addUser(username, password, role);
+            String msg = success ? "Staff added successfully!" : "Failed to add staff (username may exist).";
+
+            // reload user list
+            List<User> users = userService.getAllUsers();
+            request.setAttribute("users", users);
+            request.setAttribute("msg", msg);
+            request.getRequestDispatcher("user-management.jsp").forward(request, response);
+            return;
+
+        } else if ("update".equals(action)) {
+            // ✅ Update user
             int id = Integer.parseInt(request.getParameter("id"));
             String username = request.getParameter("username");
             String role = request.getParameter("role");
@@ -53,23 +76,32 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
 
             boolean success = userService.updateUser(id, username, role, password);
             String msg = success ? "User updated successfully!" : "Failed to update user.";
-            response.sendRedirect("user?msg=" + java.net.URLEncoder.encode(msg, "UTF-8"));
+
+            List<User> users = userService.getAllUsers();
+            request.setAttribute("users", users);
+            request.setAttribute("msg", msg);
+            request.getRequestDispatcher("user-management.jsp").forward(request, response);
             return;
 
         } else if ("delete".equals(action)) {
+            // ✅ Delete user
             int id = Integer.parseInt(request.getParameter("id"));
-
             boolean success = userService.deleteUser(id);
             String msg = success ? "User deleted successfully!" : "Failed to delete user.";
-            response.sendRedirect("user?msg=" + java.net.URLEncoder.encode(msg, "UTF-8"));
+
+            List<User> users = userService.getAllUsers();
+            request.setAttribute("users", users);
+            request.setAttribute("msg", msg);
+            request.getRequestDispatcher("user-management.jsp").forward(request, response);
             return;
 
-        } else if ("register".equals(action)) {   // 🔹 Sign-up handler
+        } else if ("register".equals(action)) {
+            // ✅ Self registration (signup.jsp)
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             String role = request.getParameter("role");
 
-            // 🔹 Check if username already exists
+            // check if username already exists
             User existingUser = userService.getUserByUsername(username);
             if (existingUser != null) {
                 request.setAttribute("error", "User with this username already exists");
@@ -77,22 +109,19 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
                 return;
             }
 
-            // 🔹 If not exists, create new user
             boolean success = userService.addUser(username, role, password);
             if (success) {
-                response.sendRedirect("login.jsp?msg=" + java.net.URLEncoder.encode("Account created successfully! Please login.", "UTF-8"));
+                response.sendRedirect("login.jsp?msg="
+                        + java.net.URLEncoder.encode("Account created successfully! Please login.", "UTF-8"));
             } else {
                 request.setAttribute("error", "Failed to register. Try again.");
                 request.getRequestDispatcher("signup.jsp").forward(request, response);
             }
             return;
-        } else {
-            response.sendRedirect("user");
         }
+
+        // fallback
+        response.sendRedirect("user");
     }
-
-
-
-
 }
- 
+
