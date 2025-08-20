@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Pahana Edu Bill System
 
 ## Project Overview
@@ -22,3 +23,6 @@ Key features include:
 
 ---
 
+=======
+# ProjectPahana
+>>>>>>> fa464fc643496d4806b88a30f37d2cb60e9181ac
